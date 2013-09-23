@@ -24,6 +24,10 @@ class FuturesSpec extends Specification with NoTimeConversions {
 
         wait for all to succeed             $e4
         return last failure if there is one $e5
+
+      Timeout
+
+        infinite loop $e6
     """
 
   def e1 = {
@@ -79,5 +83,17 @@ class FuturesSpec extends Specification with NoTimeConversions {
 
     Await.result(f, Duration.Inf) must
     throwA[IllegalArgumentException](message = "late")
+  }
+
+  def e6 = {
+    val f = future {
+      while (true) {
+        // nothing
+      }
+    }
+
+    import scala.concurrent.duration._
+    Await.result(f, 5.seconds) must
+    throwA[TimeoutException]
   }
 }
